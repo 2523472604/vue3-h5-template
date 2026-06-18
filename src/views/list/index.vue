@@ -39,7 +39,9 @@ const {
       v-for="item in list"
       :key="item.id"
       :title="item.title"
-      :label="`ID: ${item.id} · 向下滑动可测试上拉加载与回到顶部`"
+      :label="`ID: ${item.id} · 点击进入详情页`"
+      is-link
+      :to="{ name: 'DetailDemo', params: { id: String(item.id) } }"
     />
   </ScrollRefreshList>
 </template>

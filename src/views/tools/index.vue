@@ -13,18 +13,12 @@ import FilePreview from "@/components/FilePreview/index.vue";
 import ImageUpload from "@/components/ImageUpload/index.vue";
 import ImagePreview from "@/components/ImagePreview/index.vue";
 import ScrollRefreshList from "@/components/ScrollRefreshList/index.vue";
-import PopupMultiSelect from "@/components/PopupMultiSelect/index.vue";
-import PopupSelect from "@/components/PopupSelect/index.vue";
-import AreaPicker from "@/components/AreaPicker/index.vue";
-import DateTimePicker from "@/components/DateTimePicker/index.vue";
 import StickyActionBar from "@/components/StickyActionBar/index.vue";
 import ActionSheetMenu from "@/components/ActionSheetMenu/index.vue";
-import ResultPage from "@/components/ResultPage/index.vue";
 import BaseCard from "@/components/BaseCard/index.vue";
 import { usePagedList } from "@/hooks/usePagedList";
 import { getListApi } from "@/api/mock";
 import { confirm } from "@/utils/feedback";
-import { getCurrentTime } from "@/utils/format-time";
 const demoImages = ref([]);
 const demoFiles = ref([]);
 /** 手风琴模式：同时只展开一个面板，值为当前展开项的 name */
@@ -63,39 +57,7 @@ const {
   pageSize: 25
 });
 
-const demoTags = ref(["vue", "vant"]);
-const tagOptions = [
-  { label: "Vue", value: "vue" },
-  { label: "Vite", value: "vite" },
-  { label: "Vant", value: "vant" },
-  { label: "Pinia", value: "pinia" },
-  { label: "TypeScript", value: "ts" },
-  { label: "Tailwind", value: "tailwind" }
-];
-
-const demoRegion = ref({
-  code: "330106",
-  label: "浙江省 / 杭州市 / 西湖区",
-  province: "浙江省",
-  city: "杭州市",
-  county: "西湖区",
-  codes: ["330000", "330100", "330106"]
-});
-
-const demoDate = ref(getCurrentTime("date"));
-const demoTime = ref(getCurrentTime("时分"));
-const demoDatetime = ref(getCurrentTime("datetime"));
-const demoStatus = ref("pending");
-
-const statusOptions = [
-  { label: "待处理", value: "pending" },
-  { label: "处理中", value: "processing" },
-  { label: "已完成", value: "done" },
-  { label: "已关闭", value: "closed", disabled: true }
-];
-
 const showActionSheet = ref(false);
-const resultStatus = ref("success");
 
 async function onDemoConfirm() {
   try {
@@ -160,7 +122,7 @@ function onStickySubmit() {
 
             <div class="mt-3">
               <p class="text-[12px] mb-2 text-[var(--color-text-secondary)]">
-                文件预览列表（支持图片弹层预览、打开和下载）：
+                文件预览列表（支持在线预览与下载）：
               </p>
               <FilePreview :files="demoFiles" />
             </div>
@@ -233,98 +195,34 @@ function onStickySubmit() {
       <van-collapse-item name="form" title="表单相关">
         <div class="pt-[8px]">
           <p class="text-[12px] mb-2 text-[var(--color-text-secondary)]">
-            弹出层多选（
-            <code>PopupMultiSelect</code>
-            ）：
-          </p>
-
-          <PopupMultiSelect
-            v-model="demoTags"
-            field-label="技术栈"
-            title="选择技术栈"
-            placeholder="请选择技术栈"
-            :options="tagOptions"
-          />
-
-          <div
-            class="mt-3 text-[12px] text-[var(--color-text-secondary)] break-all"
-          >
-            当前选中值：
-            {{ demoTags }}
-          </div>
-
-          <p class="text-[12px] mb-2 mt-4 text-[var(--color-text-secondary)]">
-            省市区选择（
+            完整表单页（校验 +
             <code>AreaPicker</code>
-            ）：
-          </p>
-
-          <AreaPicker
-            v-model="demoRegion"
-            field-label="所在地区"
-            title="选择省市区"
-            placeholder="请选择省市区"
-          />
-
-          <div
-            class="mt-3 text-[12px] text-[var(--color-text-secondary)] break-all"
-          >
-            当前地区：
-            {{ demoRegion }}
-          </div>
-
-          <p class="text-[12px] mb-2 mt-4 text-[var(--color-text-secondary)]">
-            日期 / 时间（
+            /
             <code>DateTimePicker</code>
-            ）：
+            + 底部提交栏）：
           </p>
 
-          <DateTimePicker
-            v-model="demoDate"
-            type="date"
-            field-label="预约日期"
-            display-format="年月日"
+          <van-cell
+            title="打开表单示例页"
+            label="独立全屏页，隐藏 Tabbar，可复制为业务表单"
+            is-link
+            :to="{ name: 'FormDemo' }"
           />
-          <DateTimePicker
-            v-model="demoTime"
-            type="time"
-            field-label="预约时间"
-            class="mt-2"
-          />
-          <DateTimePicker
-            v-model="demoDatetime"
-            type="datetime"
-            field-label="完整时间"
-            display-format="年月日时分"
-            class="mt-2"
-          />
-
-          <div
-            class="mt-3 text-[12px] text-[var(--color-text-secondary)] break-all"
-          >
-            date={{ demoDate }} · time={{ demoTime }} · datetime={{
-              demoDatetime
-            }}
-          </div>
 
           <p class="text-[12px] mb-2 mt-4 text-[var(--color-text-secondary)]">
-            弹出层单选（
-            <code>PopupSelect</code>
-            ）：
+            详情页（
+            <code>PageShell</code>
+            +
+            <code>CardSection</code>
+            + 底部操作栏）：
           </p>
 
-          <PopupSelect
-            v-model="demoStatus"
-            field-label="工单状态"
-            title="选择状态"
-            :options="statusOptions"
+          <van-cell
+            title="打开详情示例页"
+            label="信息展示 + 附件预览，支持路由 id 切换数据"
+            is-link
+            :to="{ name: 'DetailDemo', params: { id: '1' } }"
           />
-
-          <div
-            class="mt-3 text-[12px] text-[var(--color-text-secondary)] break-all"
-          >
-            当前状态：{{ demoStatus }}
-          </div>
         </div>
       </van-collapse-item>
 
@@ -385,52 +283,6 @@ function onStickySubmit() {
               @select="onActionSelect"
             />
           </section>
-
-          <section>
-            <p class="text-[12px] mb-2 text-[var(--color-text-secondary)]">
-              结果页（
-              <code>ResultPage</code>
-              ）：
-            </p>
-            <div class="flex gap-2 mb-3">
-              <van-button
-                size="small"
-                :type="resultStatus === 'success' ? 'primary' : 'default'"
-                @click="resultStatus = 'success'"
-              >
-                成功
-              </van-button>
-              <van-button
-                size="small"
-                :type="resultStatus === 'fail' ? 'primary' : 'default'"
-                @click="resultStatus = 'fail'"
-              >
-                失败
-              </van-button>
-              <van-button
-                size="small"
-                :type="resultStatus === 'waiting' ? 'primary' : 'default'"
-                @click="resultStatus = 'waiting'"
-              >
-                等待
-              </van-button>
-            </div>
-            <ResultPage
-              :status="resultStatus"
-              :description="
-                resultStatus === 'success'
-                  ? '您的申请已提交，请耐心等待审核'
-                  : resultStatus === 'fail'
-                    ? '提交失败，请稍后重试'
-                    : '正在处理中，请勿关闭页面'
-              "
-            >
-              <template #actions>
-                <van-button plain>返回首页</van-button>
-                <van-button type="primary">查看详情</van-button>
-              </template>
-            </ResultPage>
-          </section>
         </div>
       </van-collapse-item>
 
@@ -442,39 +294,12 @@ function onStickySubmit() {
             ）：
           </p>
 
-          <BaseCard
-            title="基础卡片"
-            subtitle="带标题、副标题与内容区"
-            shadow="sm"
-          >
-            适用于信息分组展示，支持深色模式。
+          <BaseCard>
+            基础卡片容器，适用于信息分组展示，支持深色模式。
           </BaseCard>
 
-          <BaseCard
-            title="订单详情"
-            subtitle="待支付"
-            shadow="md"
-            border
-            header-divider
-            clickable
-            @click="() => {}"
-          >
-            <template #extra>
-              <span class="text-[var(--van-primary-color)]">查看</span>
-            </template>
-            商品：Vue3 H5 模板 · ¥99.00
-            <template #footer>
-              <van-button size="small" plain>取消</van-button>
-              <van-button size="small" type="primary">去支付</van-button>
-            </template>
-          </BaseCard>
-
-          <BaseCard title="通栏内容" body-padding="0" shadow="sm">
-            <div
-              class="h-[88px] flex items-center justify-center text-[12px] text-[var(--color-text-secondary)] bg-[var(--van-gray-1)]"
-            >
-              body-padding="0" 适合图片 / 图表通栏
-            </div>
+          <BaseCard shadow="md" border>
+            带边框与稍强阴影的卡片，内容自行组织标题、按钮等。
           </BaseCard>
         </div>
       </van-collapse-item>

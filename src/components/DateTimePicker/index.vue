@@ -290,8 +290,8 @@ defineExpose({ open, close });
 
 <style scoped>
 .date-time-picker :deep(.van-cell__value) {
-  flex: 2;
-  text-align: right;
+  flex: 1;
+  text-align: left;
 }
 
 .date-time-picker .is-placeholder :deep(.van-cell__value) {

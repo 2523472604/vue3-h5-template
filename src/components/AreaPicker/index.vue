@@ -78,6 +78,11 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  /** 是否显示必填星号 */
+  required: {
+    type: Boolean,
+    default: false
+  },
   confirmButtonText: {
     type: String,
     default: "确认"
@@ -180,6 +185,7 @@ defineExpose({ open, close });
       <van-cell
         :title="fieldLabel || title"
         :value="displayText"
+        :required="required"
         :is-link="!disabled"
         :class="{ 'is-placeholder': !modelValue?.label }"
         @click="open"
@@ -208,8 +214,8 @@ defineExpose({ open, close });
 
 <style scoped>
 .area-picker :deep(.van-cell__value) {
-  flex: 2;
-  text-align: right;
+  flex: 1;
+  text-align: left;
 }
 
 .area-picker .is-placeholder :deep(.van-cell__value) {

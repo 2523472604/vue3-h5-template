@@ -64,6 +64,32 @@ const routes = [
         }
       },
       {
+        path: "form-demo",
+        name: "FormDemo",
+        component: () => import("@/views/form/index.vue"),
+        meta: {
+          title: "表单示例",
+          showNavBar: true,
+          leftArrow: true,
+          showTabbar: false,
+          showDarkMode: true,
+          noCache: true
+        }
+      },
+      {
+        path: "detail-demo/:id?",
+        name: "DetailDemo",
+        component: () => import("@/views/detail/index.vue"),
+        meta: {
+          title: "详情示例",
+          showNavBar: true,
+          leftArrow: true,
+          showTabbar: false,
+          showDarkMode: true,
+          noCache: true
+        }
+      },
+      {
         path: ":pathMatch(.*)*",
         name: "NotFound",
         component: () => import("@/views/error/404.vue"),

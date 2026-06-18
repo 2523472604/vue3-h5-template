@@ -223,8 +223,8 @@ defineExpose({ open, close });
 
 <style scoped>
 .popup-select :deep(.van-cell__value) {
-  flex: 2;
-  text-align: right;
+  flex: 1;
+  text-align: left;
 }
 
 .popup-select .is-placeholder :deep(.van-cell__value) {

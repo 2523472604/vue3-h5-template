@@ -84,6 +84,11 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  /** 是否显示必填星号 */
+  required: {
+    type: Boolean,
+    default: false
+  },
   /** 最大可选数量，0 表示不限制 */
   max: {
     type: Number,
@@ -254,6 +259,7 @@ defineExpose({ open, close });
       <van-cell
         :title="fieldLabel || title"
         :value="displayText"
+        :required="required"
         :is-link="!disabled"
         :class="{ 'is-placeholder': !safeValue.length }"
         @click="open"
@@ -324,8 +330,8 @@ defineExpose({ open, close });
 
 <style scoped>
 .popup-multi-select :deep(.van-cell__value) {
-  flex: 2;
-  text-align: right;
+  flex: 1;
+  text-align: left;
 }
 
 .popup-multi-select .is-placeholder :deep(.van-cell__value) {
