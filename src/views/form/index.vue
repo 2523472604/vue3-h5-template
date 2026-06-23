@@ -1,6 +1,6 @@
 <script setup name="FormDemo">
-import { ref } from "vue";
-import { showSuccessToast } from "vant";
+import { defineAsyncComponent, ref } from "vue";
+import { showSuccessToast } from "vant/es/toast";
 import "vant/es/form/style";
 import "vant/es/field/style";
 import "vant/es/button/style";
@@ -10,9 +10,12 @@ import PageShell from "@/components/PageShell/index.vue";
 import CardSection from "@/components/CardSection/index.vue";
 import PopupMultiSelect from "@/components/PopupMultiSelect/index.vue";
 import PopupSelect from "@/components/PopupSelect/index.vue";
-import AreaPicker from "@/components/AreaPicker/index.vue";
 import DateTimePicker from "@/components/DateTimePicker/index.vue";
 import StickyActionBar from "@/components/StickyActionBar/index.vue";
+
+const AreaPicker = defineAsyncComponent(
+  () => import("@/components/AreaPicker/index.vue")
+);
 import { confirm } from "@/utils/feedback";
 import {
   ruleChineseName,

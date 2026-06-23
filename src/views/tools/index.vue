@@ -1,6 +1,6 @@
 <script setup name="Tools">
-import { ref } from "vue";
-import { showSuccessToast } from "vant";
+import { defineAsyncComponent, ref } from "vue";
+import { showSuccessToast } from "vant/es/toast";
 import "vant/es/collapse/style";
 import "vant/es/collapse-item/style";
 import "vant/es/cell/style";
@@ -8,17 +8,28 @@ import "vant/es/field/style";
 import "vant/es/button/style";
 import "vant/es/toast/style";
 
-import FileUpload from "@/components/FileUpload/index.vue";
-import FilePreview from "@/components/FilePreview/index.vue";
-import ImageUpload from "@/components/ImageUpload/index.vue";
-import ImagePreview from "@/components/ImagePreview/index.vue";
-import ScrollRefreshList from "@/components/ScrollRefreshList/index.vue";
 import StickyActionBar from "@/components/StickyActionBar/index.vue";
 import ActionSheetMenu from "@/components/ActionSheetMenu/index.vue";
 import BaseCard from "@/components/BaseCard/index.vue";
 import { usePagedList } from "@/hooks/usePagedList";
-import { getListApi } from "@/api/mock";
 import { confirm } from "@/utils/feedback";
+import { THEME_COLORS } from "@/constants/theme";
+
+const FileUpload = defineAsyncComponent(
+  () => import("@/components/FileUpload/index.vue")
+);
+const FilePreview = defineAsyncComponent(
+  () => import("@/components/FilePreview/index.vue")
+);
+const ImageUpload = defineAsyncComponent(
+  () => import("@/components/ImageUpload/index.vue")
+);
+const ImagePreview = defineAsyncComponent(
+  () => import("@/components/ImagePreview/index.vue")
+);
+const ScrollRefreshList = defineAsyncComponent(
+  () => import("@/components/ScrollRefreshList/index.vue")
+);
 const demoImages = ref([]);
 const demoFiles = ref([]);
 /** 手风琴模式：同时只展开一个面板，值为当前展开项的 name */
@@ -50,7 +61,8 @@ const {
   onLoad
 } = usePagedList({
   // fetcher 会收到 { page, pageSize }，直接透传给 API 即可
-  fetcher: ({ page, pageSize }) => getListApi({ page, pageSize }),
+  fetcher: ({ page, pageSize }) =>
+    import("@/api/mock").then(m => m.getListApi({ page, pageSize })),
   // 若后端字段不同，在这里做映射，例如 res.records / res.totalCount
   getList: res => res.list,
   getTotal: res => res.total,
@@ -278,7 +290,7 @@ function onStickySubmit() {
               :options="[
                 { label: '编辑', value: 'edit' },
                 { label: '分享', value: 'share' },
-                { label: '删除', value: 'delete', color: '#ee0a24' }
+                { label: '删除', value: 'delete', color: THEME_COLORS.danger }
               ]"
               @select="onActionSelect"
             />

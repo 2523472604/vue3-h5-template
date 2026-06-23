@@ -12,6 +12,7 @@ import CardSection from "@/components/CardSection/index.vue";
 import FilePreview from "@/components/FilePreview/index.vue";
 import StickyActionBar from "@/components/StickyActionBar/index.vue";
 import ActionSheetMenu from "@/components/ActionSheetMenu/index.vue";
+import { THEME_COLORS } from "@/constants/theme";
 
 const route = useRoute();
 const router = useRouter();
@@ -128,7 +129,7 @@ function onMore() {
       :options="[
         { label: '分享', value: 'share' },
         { label: '导出', value: 'export' },
-        { label: '删除', value: 'delete', color: '#ee0a24' }
+        { label: '删除', value: 'delete', color: THEME_COLORS.danger }
       ]"
       @select="onMoreSelect"
     />

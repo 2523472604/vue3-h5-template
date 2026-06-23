@@ -37,10 +37,10 @@
  * ---------------------------------------------------------------------------
  */
 import { computed, ref, watch } from "vue";
-import { areaList as defaultAreaList } from "@vant/area-data";
 import "vant/es/popup/style";
 import "vant/es/area/style";
 import "vant/es/cell/style";
+import "vant/es/loading/style";
 
 const props = defineProps({
   /** v-model：选中的地区对象，未选时为 null */
@@ -111,6 +111,8 @@ const emit = defineEmits([
 
 const innerShow = ref(false);
 const draftCode = ref("");
+const defaultAreaList = ref(null);
+const areaDataLoading = ref(false);
 
 const visible = computed({
   get: () => (props.show !== undefined ? props.show : innerShow.value),
@@ -120,7 +122,20 @@ const visible = computed({
   }
 });
 
-const resolvedAreaList = computed(() => props.areaList || defaultAreaList);
+const resolvedAreaList = computed(
+  () => props.areaList || defaultAreaList.value || null
+);
+
+async function ensureAreaData() {
+  if (props.areaList || defaultAreaList.value || areaDataLoading.value) return;
+  areaDataLoading.value = true;
+  try {
+    const mod = await import("@vant/area-data");
+    defaultAreaList.value = mod.areaList;
+  } finally {
+    areaDataLoading.value = false;
+  }
+}
 
 const displayText = computed(
   () => props.modelValue?.label || props.placeholder
@@ -151,6 +166,7 @@ function buildResult(selectedOptions) {
 function open() {
   if (props.disabled) return;
   draftCode.value = props.modelValue?.code || "";
+  ensureAreaData();
   visible.value = true;
 }
 
@@ -199,6 +215,7 @@ defineExpose({ open, close });
       :close-on-click-overlay="closeOnClickOverlay"
     >
       <van-area
+        v-if="resolvedAreaList"
         v-model="draftCode"
         :title="title"
         :area-list="resolvedAreaList"
@@ -208,6 +225,9 @@ defineExpose({ open, close });
         @confirm="onConfirm"
         @cancel="onCancel"
       />
+      <div v-else class="area-picker__loading">
+        <van-loading size="24px">加载地区数据...</van-loading>
+      </div>
     </van-popup>
   </div>
 </template>
@@ -220,5 +240,12 @@ defineExpose({ open, close });
 
 .area-picker .is-placeholder :deep(.van-cell__value) {
   color: var(--color-text-secondary);
+}
+
+.area-picker__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 260px;
 }
 </style>

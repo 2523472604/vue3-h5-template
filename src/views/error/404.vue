@@ -1,6 +1,7 @@
 <script setup name="NotFound">
 import { useRouter } from "vue-router";
 import { useDarkMode } from "@/hooks/useToggleDarkMode";
+import { vantThemeVars } from "@/constants/theme";
 import "vant/es/empty/style";
 import "vant/es/button/style";
 
@@ -21,7 +22,10 @@ function goBack() {
 </script>
 
 <template>
-  <van-config-provider :theme="darkMode ? 'dark' : 'light'">
+  <van-config-provider
+    :theme="darkMode ? 'dark' : 'light'"
+    :theme-vars="vantThemeVars"
+  >
     <div class="not-found-page">
       <van-empty image="error" description="抱歉，您访问的页面不存在">
         <div class="not-found-page__actions">

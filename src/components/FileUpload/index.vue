@@ -306,6 +306,12 @@ function onDelete(file) {
   updateModelValueFromFileList();
 }
 
+function isPreviewImage(file) {
+  if (file?.isImage) return true;
+  const type = String(file?.type || file?.file?.type || "").toLowerCase();
+  return type.startsWith("image/");
+}
+
 function clear() {
   fileList.value.forEach(item => revokeIfLocalBlobUrl(item?.url));
   fileList.value = [];
@@ -323,41 +329,135 @@ defineExpose({ clear, fileList });
 <template>
   <van-uploader
     v-model="fileList"
+    class="file-upload"
     :multiple="multiple"
     :max-count="maxCount"
     :accept="accept"
     :max-size="maxSize"
     :preview-image="previewImage"
     :deletable="deletable"
-    :upload-text="uploadText"
     :after-read="onAfterRead"
     @oversize="onOversize"
     @delete="onDelete"
   >
+    <template #preview-cover="{ file }">
+      <div v-if="!isPreviewImage(file)" class="file-upload-file-icon">
+        <div class="file-upload-file-icon__badge">
+          <van-icon name="description" size="20" />
+        </div>
+      </div>
+    </template>
+
+    <template v-if="deletable" #preview-delete>
+      <div class="file-upload-delete" aria-label="删除">
+        <van-icon name="cross" size="10" color="#fff" />
+      </div>
+    </template>
+
     <div class="file-upload-trigger">
-      <van-icon name="description" size="24" />
+      <div class="file-upload-trigger__icon">
+        <van-icon name="description" size="22" />
+      </div>
       <span class="file-upload-trigger__text">{{ uploadText }}</span>
     </div>
   </van-uploader>
 </template>
 
 <style scoped>
+.file-upload :deep(.van-uploader__wrapper) {
+  gap: 10px;
+}
+
+.file-upload :deep(.van-uploader__preview),
+.file-upload :deep(.van-uploader__file) {
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--van-background-2);
+  border: 1px solid var(--van-border-color);
+}
+
+.file-upload :deep(.van-uploader__file-icon) {
+  display: none;
+}
+
+.file-upload :deep(.van-uploader__file-name) {
+  margin-top: 40px;
+  padding: 0 6px 8px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--color-text);
+}
+
+.file-upload :deep(.van-uploader__preview-delete) {
+  top: 4px;
+  right: 4px;
+  width: auto;
+  height: auto;
+  background: transparent;
+  border-radius: 0;
+}
+
+.file-upload-file-icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 24px;
+  pointer-events: none;
+}
+
+.file-upload-file-icon__badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  background: var(--color-primary-light-2);
+}
+
+.file-upload-delete {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
 .file-upload-trigger {
   width: 80px;
   height: 80px;
-  background: var(--van-gray-1);
-  border: 1px dashed var(--van-border-color);
-  border-radius: 8px;
+  background: var(--color-primary-light-1);
+  border: 1px dashed var(--color-primary-light-3);
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-secondary);
+  color: var(--color-primary);
+  box-sizing: border-box;
+}
+
+.file-upload-trigger__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary-light-2);
 }
 
 .file-upload-trigger__text {
   margin-top: 6px;
   font-size: 12px;
-  line-height: 1;
+  line-height: 1.2;
+  padding: 0 6px;
+  text-align: center;
 }
 </style>

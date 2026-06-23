@@ -193,21 +193,20 @@ defineExpose({ open, close });
 
       <div class="popup-select__body">
         <van-radio-group v-model="draftValue">
-          <van-cell
+          <div
             v-for="item in normalizedOptions"
             :key="String(item.value)"
-            clickable
-            :title="item.label"
+            class="popup-select__option van-hairline--bottom"
+            :class="{ 'is-disabled': item.disabled }"
             @click="!item.disabled && selectOption(item.value)"
           >
-            <template #right-icon>
-              <van-radio
-                :name="item.value"
-                :disabled="item.disabled"
-                @click.stop
-              />
-            </template>
-          </van-cell>
+            <span class="popup-select__option-label">{{ item.label }}</span>
+            <van-radio
+              :name="item.value"
+              :disabled="item.disabled"
+              @click.stop
+            />
+          </div>
         </van-radio-group>
       </div>
 
@@ -244,6 +243,36 @@ defineExpose({ open, close });
 .popup-select__body {
   max-height: 50vh;
   overflow-y: auto;
+}
+
+.popup-select__body :deep(.van-radio-group) {
+  width: 100%;
+}
+
+.popup-select__option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: var(--van-cell-line-height, 24px);
+  padding: var(--van-cell-vertical-padding, 10px) var(--van-cell-horizontal-padding, 16px);
+  box-sizing: border-box;
+  background: var(--van-cell-background, var(--van-background-2));
+  cursor: pointer;
+}
+
+.popup-select__option.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.popup-select__option-label {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--van-cell-font-size, 14px);
+  line-height: var(--van-cell-line-height, 24px);
+  color: var(--van-cell-text-color, var(--van-text-color));
 }
 
 .popup-select__footer {

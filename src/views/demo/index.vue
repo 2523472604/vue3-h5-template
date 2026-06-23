@@ -26,7 +26,7 @@ const contentList = reactive([
       alt="Vue logo"
       src="~@/assets/logo_melomini.png"
     />
-    <div class="pl-[12px] border-l-[3px] border-[color:#41b883]">
+    <div class="pl-[12px] border-l-[3px] border-[color:var(--color-primary)]">
       <a
         class="flex items-center"
         href="https://github.com/yulimchen/vue3-h5-template"

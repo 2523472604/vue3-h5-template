@@ -4,6 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 import { showToast } from "vant";
 import { useDarkMode } from "@/hooks/useToggleDarkMode";
 import { useUserStoreHook } from "@/store/modules/user";
+import { vantThemeVars } from "@/constants/theme";
 import "vant/es/field/style";
 import "vant/es/button/style";
 import "vant/es/cell-group/style";
@@ -46,7 +47,10 @@ async function onLogin() {
 </script>
 
 <template>
-  <van-config-provider :theme="darkMode ? 'dark' : 'light'">
+  <van-config-provider
+    :theme="darkMode ? 'dark' : 'light'"
+    :theme-vars="vantThemeVars"
+  >
     <div class="login-page">
       <div class="login-page__bg" />
 
@@ -108,7 +112,12 @@ async function onLogin() {
   position: absolute;
   inset: 0 0 auto;
   height: 42vh;
-  background: linear-gradient(160deg, #41b883 0%, #2f9e6b 70%, #248a5c 100%);
+  background: linear-gradient(
+    160deg,
+    var(--color-primary) 0%,
+    var(--color-primary-dark) 70%,
+    var(--color-primary-darker) 100%
+  );
 }
 
 .login-page__content {
@@ -152,7 +161,7 @@ async function onLogin() {
   height: 44px;
   font-size: 16px;
   border: none;
-  background: linear-gradient(135deg, #41b883, #2f9e6b);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
 }
 
 .login-page__tip {

@@ -4,6 +4,7 @@ import Axios from "axios";
 import { showToast } from "vant";
 import "vant/es/uploader/style";
 import "vant/es/toast/style";
+import "vant/es/icon/style";
 
 const props = defineProps({
   /**
@@ -293,17 +294,104 @@ defineExpose({ clear, fileList });
 <template>
   <van-uploader
     v-model="fileList"
+    class="image-upload"
     :multiple="multiple"
     :max-count="maxCount"
     :accept="accept"
     :max-size="maxSize"
     :preview-full-image="previewFullImage"
-    :upload-text="uploadText"
     :before-read="onBeforeRead"
     :after-read="onAfterRead"
     @oversize="onOversize"
     @delete="onDelete"
-  />
+  >
+    <template #preview-delete>
+      <div class="image-upload-delete" aria-label="删除">
+        <van-icon name="cross" size="10" color="#fff" />
+      </div>
+    </template>
+
+    <div class="image-upload-trigger">
+      <div class="image-upload-trigger__icon">
+        <van-icon name="photograph" size="22" />
+      </div>
+      <span class="image-upload-trigger__text">{{ uploadText }}</span>
+    </div>
+  </van-uploader>
 </template>
 
-<style scoped></style>
+<style scoped>
+.image-upload :deep(.van-uploader__wrapper) {
+  gap: 10px;
+}
+
+.image-upload :deep(.van-uploader__preview) {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.image-upload :deep(.van-uploader__preview-image) {
+  border-radius: 12px;
+}
+
+.image-upload :deep(.van-uploader__preview-delete) {
+  top: 4px;
+  right: 4px;
+  width: auto;
+  height: auto;
+  background: transparent;
+  border-radius: 0;
+  transform: none;
+}
+
+.image-upload :deep(.van-uploader__preview-delete-icon) {
+  display: none;
+}
+
+.image-upload-delete {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+.image-upload :deep(.van-uploader__mask) {
+  border-radius: 12px;
+}
+
+.image-upload-trigger {
+  width: 80px;
+  height: 80px;
+  background: var(--color-primary-light-1);
+  border: 1px dashed var(--color-primary-light-3);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  box-sizing: border-box;
+}
+
+.image-upload-trigger__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary-light-2);
+}
+
+.image-upload-trigger__text {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.2;
+  padding: 0 4px;
+  text-align: center;
+}
+</style>

@@ -10,15 +10,24 @@ import path from "path";
 import mockDevServerPlugin from "vite-plugin-mock-dev-server";
 import viteCompression from "vite-plugin-compression";
 import { createHtmlPlugin } from "vite-plugin-html";
+import { visualizer } from "rollup-plugin-visualizer";
 import { enableCDN } from "./build/cdn";
+import { manualChunks } from "./build/manual-chunks";
 
 // 当前工作目录路径
 const root = process.cwd();
+
+function escapeRegExp(str) {
+  return String(str).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   // 环境变量
   const env = loadEnv(mode, root, "");
+  const apiPrefix = (env.VITE_BASE_API || "/dev-api").replace(/\/$/, "") || "/dev-api";
+  const proxyTarget = (env.VITE_PROXY_TARGET || "").trim();
+
   return {
     base: env.VITE_BASE_URL || "/",
     plugins: [
@@ -48,8 +57,16 @@ export default defineConfig(({ mode }) => {
         }
       }),
       // 生产环境默认不启用 CDN 加速
-      enableCDN(env.VITE_CDN_DEPS)
-    ],
+      enableCDN(env.VITE_CDN_DEPS),
+      // 打包体积分析：pnpm build:analyze
+      mode === "analyze" &&
+        visualizer({
+          open: true,
+          gzipSize: true,
+          brotliSize: true,
+          filename: "dist/stats.html"
+        })
+    ].filter(Boolean),
     resolve: {
       alias: {
         "@": fileURLToPath(new URL("./src", import.meta.url))
@@ -57,11 +74,19 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       host: true,
-      // 仅在 proxy 中配置的代理前缀， mock-dev-server 才会拦截并 mock
+      // proxy 前缀须与 VITE_BASE_API 一致；target 留空时由 mock-dev-server 拦截
+      // 联调真实后端：在 .env.development 配置 VITE_PROXY_TARGET=http://127.0.0.1:8080
       // doc: https://github.com/pengzhanbo/vite-plugin-mock-dev-server
       proxy: {
-        "^/dev-api": {
-          target: ""
+        [`^${escapeRegExp(apiPrefix)}`]: {
+          target: proxyTarget || "",
+          changeOrigin: Boolean(proxyTarget),
+          ...(proxyTarget
+            ? {
+                rewrite: path =>
+                  path.replace(new RegExp(`^${escapeRegExp(apiPrefix)}`), "")
+              }
+            : {})
         }
       }
     },
@@ -70,7 +95,8 @@ export default defineConfig(({ mode }) => {
         output: {
           chunkFileNames: "static/js/[name]-[hash].js",
           entryFileNames: "static/js/[name]-[hash].js",
-          assetFileNames: "static/[ext]/[name]-[hash].[ext]"
+          assetFileNames: "static/[ext]/[name]-[hash].[ext]",
+          manualChunks
         }
       }
     }

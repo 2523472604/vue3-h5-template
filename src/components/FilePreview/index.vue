@@ -78,6 +78,25 @@ function getFileKind(file) {
   return "other";
 }
 
+function getFileIconName(file) {
+  const kind = getFileKind(file);
+  if (kind === "image") return "photo-o";
+  if (kind === "video") return "video-o";
+  if (kind === "audio") return "music-o";
+  return "";
+}
+
+function getFileTypeLabel(file) {
+  const kind = getFileKind(file);
+  if (["image", "video", "audio"].includes(kind)) return "";
+
+  const ext = getExt(file?.name || file?.url);
+  if (ext === "pdf") return "PDF";
+  if (ext) return ext.slice(0, 4).toUpperCase();
+  if (kind === "text") return "TXT";
+  return "FILE";
+}
+
 function isImageType(file) {
   return getFileKind(file) === "image";
 }
@@ -119,16 +138,6 @@ function formatSize(size) {
   if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
   if (n < 1024 * 1024 * 1024) return `${(n / 1024 / 1024).toFixed(1)} MB`;
   return `${(n / 1024 / 1024 / 1024).toFixed(1)} GB`;
-}
-
-function getIconName(file) {
-  const kind = getFileKind(file);
-  if (kind === "image") return "photo-o";
-  if (kind === "video") return "video-o";
-  if (kind === "audio") return "music-o";
-  if (kind === "pdf") return "description";
-  if (kind === "text") return "notes-o";
-  return "description";
 }
 
 function openImagePreview(url) {
@@ -236,7 +245,19 @@ function onRowClick(file) {
       @click="onRowClick(file)"
     >
       <template #icon>
-        <van-icon :name="getIconName(file)" size="18" />
+        <div
+          class="file-preview-icon"
+          :class="`file-preview-icon--${getFileKind(file)}`"
+        >
+          <van-icon
+            v-if="getFileIconName(file)"
+            :name="getFileIconName(file)"
+            size="20"
+          />
+          <span v-else class="file-preview-icon__label">{{
+            getFileTypeLabel(file)
+          }}</span>
+        </div>
       </template>
       <template #right-icon>
         <div class="file-preview-actions">
@@ -324,7 +345,54 @@ function onRowClick(file) {
 }
 
 .file-preview-item :deep(.van-cell__title) {
-  margin-left: 8px;
+  margin-left: 10px;
+}
+
+.file-preview-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.file-preview-icon__label {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+.file-preview-icon--image {
+  color: var(--color-primary);
+  background: var(--color-primary-light-2);
+}
+
+.file-preview-icon--video {
+  color: #7232dd;
+  background: rgba(114, 50, 221, 0.1);
+}
+
+.file-preview-icon--audio {
+  color: #07c160;
+  background: rgba(7, 193, 96, 0.1);
+}
+
+.file-preview-icon--pdf {
+  color: var(--color-danger);
+  background: rgba(238, 10, 36, 0.08);
+}
+
+.file-preview-icon--text {
+  color: #ff976a;
+  background: rgba(255, 151, 106, 0.12);
+}
+
+.file-preview-icon--other {
+  color: #646566;
+  background: rgba(100, 101, 102, 0.08);
 }
 
 .file-preview-item.is-previewable {

@@ -4,6 +4,7 @@ import NavBar from "@/components/NavBar/index.vue";
 import { useDarkMode } from "@/hooks/useToggleDarkMode";
 import { createNavBarConfig, NAV_BAR_CONFIG_KEY } from "@/hooks/useNavBar";
 import { useCachedViewStoreHook } from "@/store/modules/cachedView";
+import { vantThemeVars } from "@/constants/theme";
 import { computed, provide } from "vue";
 import { useRoute } from "vue-router";
 
@@ -22,7 +23,10 @@ const darkMode = useDarkMode();
 
 <template>
   <div class="app-wrapper">
-    <van-config-provider :theme="darkMode ? 'dark' : 'light'">
+    <van-config-provider
+      :theme="darkMode ? 'dark' : 'light'"
+      :theme-vars="vantThemeVars"
+    >
       <nav-bar />
       <router-view v-slot="{ Component }">
         <keep-alive :include="cachedViews">

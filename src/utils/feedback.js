@@ -1,9 +1,10 @@
 import { showConfirmDialog, showDialog } from "vant/es/dialog";
 import { showToast, showSuccessToast, showFailToast } from "vant/es/toast";
+import { THEME_COLORS } from "@/constants/theme";
 import "vant/es/dialog/style";
 import "vant/es/toast/style";
 
-const DEFAULT_CONFIRM_COLOR = "#41b883";
+const DEFAULT_CONFIRM_COLOR = THEME_COLORS.primary;
 
 /**
  * 二次确认弹窗

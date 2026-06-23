@@ -1,5 +1,4 @@
 import Layout from "@/layout/index.vue";
-import Demo from "@/views/demo/index.vue";
 
 const routes = [
   {
@@ -19,7 +18,7 @@ const routes = [
       {
         path: "demo",
         name: "Demo",
-        component: Demo,
+        component: () => import("@/views/demo/index.vue"),
         meta: {
           title: "主页",
           showNavBar: true,

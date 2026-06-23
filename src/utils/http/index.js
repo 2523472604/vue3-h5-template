@@ -1,6 +1,6 @@
 import Axios from "axios";
 import NProgress from "../progress";
-import { showFailToast } from "vant";
+import { showFailToast } from "vant/es/toast";
 import "vant/es/toast/style";
 import { HTTP_BIZ_CODE, HTTP_TIMEOUT } from "@/constants/http";
 import { getToken } from "@/utils/auth-token";

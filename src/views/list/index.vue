@@ -1,9 +1,12 @@
 <script setup name="ListDemo">
+import { defineAsyncComponent } from "vue";
 import "vant/es/cell/style";
 
-import ScrollRefreshList from "@/components/ScrollRefreshList/index.vue";
 import { usePagedList } from "@/hooks/usePagedList";
-import { getListApi } from "@/api/mock";
+
+const ScrollRefreshList = defineAsyncComponent(
+  () => import("@/components/ScrollRefreshList/index.vue")
+);
 
 const {
   list,
@@ -15,7 +18,8 @@ const {
   onRefresh,
   onLoad
 } = usePagedList({
-  fetcher: ({ page, pageSize }) => getListApi({ page, pageSize }),
+  fetcher: ({ page, pageSize }) =>
+    import("@/api/mock").then(m => m.getListApi({ page, pageSize })),
   getList: res => res.list,
   getTotal: res => res.total,
   pageSize: 25

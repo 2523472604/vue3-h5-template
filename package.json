@@ -17,6 +17,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:analyze": "vite build --mode analyze",
     "preview": "vite preview",
     "lint:prettier": "prettier --write  \"src/**/*.{js,json,jsx,css,less,scss,vue,html,md}\""
   },
@@ -40,6 +41,7 @@
     "mockjs": "^1.1.0",
     "postcss": "^8.4.38",
     "prettier": "^3.2.5",
+    "rollup-plugin-visualizer": "^6.0.11",
     "tailwindcss": "^3.4.3",
     "unplugin-vue-components": "^0.27.0",
     "vite": "^5.2.12",
