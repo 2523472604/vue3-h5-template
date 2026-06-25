@@ -8,6 +8,10 @@ export function manualChunks(id) {
     return "vant-area-data";
   }
 
+  if (id.includes("pdfjs-dist")) {
+    return "pdfjs";
+  }
+
   if (id.includes("vant") || id.includes("@vant")) {
     return "vant-vendor";
   }

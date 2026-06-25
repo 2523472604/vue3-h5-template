@@ -277,22 +277,19 @@ defineExpose({ open, close });
         <span class="popup-multi-select__title">{{ title }}</span>
       </div>
 
-      <div v-if="showSelectAll" class="popup-multi-select__toolbar">
-        <button
-          type="button"
-          class="popup-multi-select__tool-btn"
-          :class="{ 'is-active': isAllSelected }"
+      <div v-if="showSelectAll" class="flex gap-3 px-4 pb-2">
+        <van-button
+          size="small"
+          round
+          :type="isAllSelected ? 'primary' : 'default'"
+          :plain="isAllSelected"
           @click="selectAll"
         >
           {{ selectAllText }}
-        </button>
-        <button
-          type="button"
-          class="popup-multi-select__tool-btn"
-          @click="deselectAll"
-        >
+        </van-button>
+        <van-button size="small" round @click="deselectAll">
           {{ deselectAllText }}
-        </button>
+        </van-button>
       </div>
 
       <div class="popup-multi-select__body">
@@ -345,27 +342,6 @@ defineExpose({ open, close });
 .popup-multi-select__title {
   font-size: 16px;
   font-weight: 600;
-}
-
-.popup-multi-select__toolbar {
-  display: flex;
-  gap: 12px;
-  padding: 0 16px 8px;
-}
-
-.popup-multi-select__tool-btn {
-  border: none;
-  background: var(--van-gray-1);
-  color: var(--van-text-color);
-  font-size: 12px;
-  padding: 6px 12px;
-  border-radius: 999px;
-}
-
-.popup-multi-select__tool-btn.is-active {
-  color: var(--van-primary-color);
-  border: 1px solid var(--van-primary-color);
-  background: transparent;
 }
 
 .popup-multi-select__body {

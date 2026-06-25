@@ -1,6 +1,7 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import { showImagePreview, showToast } from "vant";
+import { loadPdfDocument, renderPdfToCanvases } from "@/utils/pdf-preview";
 import "vant/es/cell/style";
 import "vant/es/icon/style";
 import "vant/es/image-preview/style";
@@ -37,6 +38,9 @@ const previewMode = ref("");
 const previewUrl = ref("");
 const previewText = ref("");
 const previewTitle = ref("");
+const pdfPageCount = ref(0);
+const pdfLoadFailed = ref(false);
+const pdfContainerRef = ref(null);
 
 function getNameFromUrl(url) {
   const raw = String(url || "");
@@ -46,7 +50,9 @@ function getNameFromUrl(url) {
 }
 
 function getExt(nameOrUrl) {
-  const plain = String(nameOrUrl || "").split("?")[0].split("#")[0];
+  const plain = String(nameOrUrl || "")
+    .split("?")[0]
+    .split("#")[0];
   const match = plain.match(/\.([a-z0-9]+)$/i);
   return match ? match[1].toLowerCase() : "";
 }
@@ -56,7 +62,10 @@ function getFileKind(file) {
   const name = file?.name || file?.url || "";
   const ext = getExt(name);
 
-  if (type.startsWith("image/") || /^(png|jpe?g|gif|webp|bmp|svg|heic|heif|jfif)$/.test(ext)) {
+  if (
+    type.startsWith("image/") ||
+    /^(png|jpe?g|gif|webp|bmp|svg|heic|heif|jfif)$/.test(ext)
+  ) {
     return "image";
   }
   if (type.startsWith("video/") || /^(mp4|webm|ogg|mov|m4v|3gp)$/.test(ext)) {
@@ -159,7 +168,46 @@ function closePreviewModal() {
   previewText.value = "";
   previewTitle.value = "";
   previewLoading.value = false;
+  pdfPageCount.value = 0;
+  pdfLoadFailed.value = false;
 }
+
+async function renderPdfPreview(url) {
+  previewLoading.value = true;
+  pdfLoadFailed.value = false;
+  pdfPageCount.value = 0;
+
+  try {
+    const pdfDoc = await loadPdfDocument(url);
+    pdfPageCount.value = pdfDoc.numPages;
+    previewLoading.value = false;
+    await nextTick();
+
+    let container = pdfContainerRef.value;
+    let canvases = container ? [...container.querySelectorAll("canvas")] : [];
+
+    if (!canvases.length && pdfPageCount.value > 0) {
+      await nextTick();
+      container = pdfContainerRef.value;
+      canvases = container ? [...container.querySelectorAll("canvas")] : [];
+    }
+
+    const containerWidth = container?.clientWidth || window.innerWidth - 24;
+
+    await renderPdfToCanvases(pdfDoc, canvases, containerWidth);
+  } catch {
+    pdfLoadFailed.value = true;
+    showToast("PDF 预览失败");
+  } finally {
+    previewLoading.value = false;
+  }
+}
+
+watch(previewVisible, val => {
+  if (val && previewMode.value === "pdf" && previewUrl.value) {
+    renderPdfPreview(previewUrl.value);
+  }
+});
 
 async function openTextPreview(file) {
   if (file.size && file.size > props.maxTextPreviewSize) {
@@ -232,7 +280,9 @@ function onRowClick(file) {
 
 <template>
   <div class="file-preview">
-    <div v-if="!normalizedFiles.length" class="file-preview-empty">暂无文件</div>
+    <div v-if="!normalizedFiles.length" class="file-preview-empty">
+      暂无文件
+    </div>
 
     <van-cell
       v-for="(file, index) in normalizedFiles"
@@ -292,8 +342,15 @@ function onRowClick(file) {
     >
       <div class="file-preview-modal__header">{{ previewTitle }}</div>
 
-      <div class="file-preview-modal__body">
-        <van-loading v-if="previewLoading" size="24" vertical>
+      <div
+        class="file-preview-modal__body"
+        :class="{ 'is-pdf': previewMode === 'pdf' }"
+      >
+        <van-loading
+          v-if="previewLoading && previewMode !== 'pdf'"
+          size="24"
+          vertical
+        >
           加载中...
         </van-loading>
 
@@ -315,12 +372,26 @@ function onRowClick(file) {
           preload="metadata"
         />
 
-        <iframe
-          v-else-if="previewMode === 'pdf'"
-          class="file-preview-pdf"
-          :src="previewUrl"
-          title="PDF 预览"
-        />
+        <div v-else-if="previewMode === 'pdf'" class="file-preview-pdf-wrap">
+          <van-loading v-if="previewLoading" size="24" vertical class="py-10">
+            PDF 加载中...
+          </van-loading>
+
+          <p
+            v-else-if="pdfLoadFailed"
+            class="m-0 px-4 py-8 text-center text-[14px] leading-relaxed text-[var(--color-text-secondary)]"
+          >
+            当前环境无法渲染 PDF
+          </p>
+
+          <div v-else ref="pdfContainerRef" class="file-preview-pdf-pages">
+            <canvas
+              v-for="page in pdfPageCount"
+              :key="page"
+              class="file-preview-pdf-page"
+            />
+          </div>
+        </div>
 
         <pre v-else-if="previewMode === 'text'" class="file-preview-text">{{
           previewText
@@ -426,8 +497,12 @@ function onRowClick(file) {
   padding: 0 12px 12px;
   overflow: auto;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
+}
+
+.file-preview-modal__body.is-pdf {
+  align-items: flex-start;
 }
 
 .file-preview-media {
@@ -441,12 +516,24 @@ function onRowClick(file) {
   width: 100%;
 }
 
-.file-preview-pdf {
+.file-preview-pdf-wrap {
   width: 100%;
-  height: 100%;
-  border: none;
-  border-radius: 8px;
-  background: var(--van-gray-1);
+}
+
+.file-preview-pdf-pages {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.file-preview-pdf-page {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
 .file-preview-text {
